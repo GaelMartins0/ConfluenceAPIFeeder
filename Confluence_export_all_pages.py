@@ -1,5 +1,5 @@
 # Command to run the script (output_dir not required):
-# python Confluence_export_all_pages.py --confluence_url https://wiki.amplexor.com/confluence --space_key 'spaceKey' --username 'username' --api_token 'password' --output_dir 'folder'
+# python Confluence_export_all_pages.py --confluence_url https://wiki.amplexor.com/confluence --space_key 'spaceKey' --username 'username' --api_token 'password'
 
 import requests
 from requests.auth import HTTPBasicAuth
