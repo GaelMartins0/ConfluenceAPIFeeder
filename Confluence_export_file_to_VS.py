@@ -1,4 +1,4 @@
-# Command to run the script (output_dir not required):
+# Command to run the script :
 # python Confluence_export_file_to_VS.py --api_key YOUR_OPENAI_API_KEY   
 
 import argparse
