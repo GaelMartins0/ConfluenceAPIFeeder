@@ -51,7 +51,7 @@ print(f"File counts: {file_batch.file_counts}")
 # Create a new Assistant with File Search Enabled
 assistant = client.beta.assistants.create(
     name="Document Search Assistant",
-    instructions="You are an expert assistant. Use your knowledge base to answer questions about the provided documents.",
+    instructions="You are a helpful assistant that answers queries based on the files provided. Make sure to try all the files before saying that you cannot find an answer. Do not use any prior knowledge or external information to answer the query. If the provided texts do not contain the answer, say that you cannot find an answer.",
     model="gpt-3.5-turbo",
     tools=[{"type": "file_search"}],
 )
