@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "confluenceapifeeder"
+version = "0.1.0"
+description = "Use Confluence API to feed Open AI Assistant and/ or RAG for the very same assistant."
+authors = ["Gael Martins"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.32.3"
+openai = "^1.37.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
