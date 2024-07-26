@@ -1,3 +1,4 @@
+# Make sure to put your OpenAI api_key in .env file 
 # Command to run the script :
 # python Confluence_export_file_to_VS.py 
 
