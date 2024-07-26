@@ -37,21 +37,31 @@ vector_store = client.beta.vector_stores.create(name=vector_store_name)
 
 # Get list of PDF files in Docs directory
 file_paths = [os.path.join("Docs", file) for file in os.listdir("Docs") if file.endswith(".pdf")]
-file_streams = [open(path, "rb") for path in file_paths]
+file_streams = []
+
+# Try to open each file and handle any errors
+for path in file_paths:
+    try:
+        file_streams.append(open(path, "rb"))
+    except Exception as e:
+        print(f"Error opening file {path}: {e}")
 
 # Upload and poll the files, and add them to the vector store
-file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-    vector_store_id=vector_store.id, files=file_streams
-)
+if file_streams:
+    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+        vector_store_id=vector_store.id, files=file_streams
+    )
 
-# Check the status
-print(f"File batch status: {file_batch.status}")
-print(f"File counts: {file_batch.file_counts}")
+    # Check the status
+    print(f"File batch status: {file_batch.status}")
+    print(f"File counts: {file_batch.file_counts}")
+else:
+    print("No files were successfully opened and uploaded.")
 
 # Create a new Assistant with File Search Enabled
 assistant = client.beta.assistants.create(
     name="Document Search Assistant",
-    instructions="You are a helpful assistant that answers queries based on the files provided. Make sure to try all the files before saying that you cannot find an answer. Do not use any prior knowledge or external information to answer the query. If the provided texts do not contain the answer, say that you cannot find an answer.",
+    instructions="You are an expert assistant. Use your knowledge base to answer questions about the provided documents.",
     model="gpt-3.5-turbo",
     tools=[{"type": "file_search"}],
 )
@@ -99,4 +109,7 @@ with client.beta.threads.runs.stream(
 
 # Close the file streams after processing
 for stream in file_streams:
-    stream.close()
+    try:
+        stream.close()
+    except Exception as e:
+        print(f"Error closing file stream: {e}")
