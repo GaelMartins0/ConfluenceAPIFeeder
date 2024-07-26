@@ -5,14 +5,22 @@ import argparse
 import os
 from openai import OpenAI, AssistantEventHandler
 from typing_extensions import override
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up command-line argument parsing
 parser = argparse.ArgumentParser(description="Export files to VS using the Confluence API.")
-parser.add_argument('--api_key', required=True, help='Your OpenAI API key')
 args = parser.parse_args()
 
-# Initialize OpenAI client with the API key from command-line argument
-client = OpenAI(api_key=args.api_key)
+# Get the API key from environment variable
+api_key = os.getenv('OPENAI_API_KEY')
+if not api_key:
+    raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
+
+# Initialize OpenAI client with the API key from environment variable
+client = OpenAI(api_key=api_key)
 
 # Define the name for the vector store
 vector_store_name = "Document Vector Store"
