@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get variables from environment
-# Get variables from environment
 confluence_url = os.getenv('CONFLUENCE_URL')
 space_key = os.getenv('SPACE_KEY')
 username = os.getenv('USERNAME')
@@ -20,20 +19,7 @@ api_token = os.getenv('API_TOKEN')
 output_dir = os.getenv('OUTPUT_DIR', 'Docs')
 
 # Check for missing variables
-space_key = os.getenv('SPACE_KEY')
-username = os.getenv('USERNAME')
-api_token = os.getenv('API_TOKEN')
-output_dir = os.getenv('OUTPUT_DIR', 'Docs')
-
-# Check for missing variables
 if not confluence_url:
-    raise ValueError("Confluence URL not found. Please set the CONFLUENCE_URL environment variable.")
-if not space_key:
-    raise ValueError("Space key not found. Please set the SPACE_KEY environment variable.")
-if not username:
-    raise ValueError("Username not found. Please set the USERNAME environment variable.")
-if not api_token:
-    raise ValueError("API token not found. Please set the API_TOKEN environment variable.")
     raise ValueError("Confluence URL not found. Please set the CONFLUENCE_URL environment variable.")
 if not space_key:
     raise ValueError("Space key not found. Please set the SPACE_KEY environment variable.")
@@ -120,7 +106,5 @@ def export_all_pages_in_space(confluence_url, space_key, username, api_token, ou
         export_page_as_pdf(confluence_url, page_id, page_title, auth, output_dir)
 
 if __name__ == '__main__':
-    export_all_pages_in_space(confluence_url, space_key, username, api_token, output_dir)
-
     export_all_pages_in_space(confluence_url, space_key, username, api_token, output_dir)
 
