@@ -1,11 +1,20 @@
 # Command to run the script (output_dir not required):
-# python Confluence_export_all_pages.py --confluence_url https://wiki.amplexor.com/confluence --space_key 'spaceKey' --username 'username' --api_token 'password'
+# python Confluence_export_all_pages.py --space_key 'spaceKey' --username 'username' --api_token 'password'
 
 import requests
 from requests.auth import HTTPBasicAuth
 import os
 import time
 import argparse
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get the API key from environment variable
+confluence_url = os.getenv('CONFLUENCE_URL')
+if not confluence_url:
+    raise ValueError("Confluence URL key not found. Please set the CONFLUENCE_URL environment variable.")
 
 def get_all_pages_in_space(confluence_url, space_key, auth):
     page_size = 25
@@ -86,7 +95,6 @@ def export_all_pages_in_space(confluence_url, space_key, username, api_token, ou
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Export all Confluence pages in a space to individual PDF files.')
-    parser.add_argument('--confluence_url', required=True, help='Base URL')
     parser.add_argument('--space_key', required=True, help='Space key of the Confluence space')
     parser.add_argument('--username', required=True, help='Username for Confluence')
     parser.add_argument('--api_token', required=True, help='API token for Confluence')
@@ -94,5 +102,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     
-    export_all_pages_in_space(args.confluence_url, args.space_key, args.username, args.api_token, args.output_dir)
-
+    export_all_pages_in_space(confluence_url, args.space_key, args.username, args.api_token, args.output_dir)
