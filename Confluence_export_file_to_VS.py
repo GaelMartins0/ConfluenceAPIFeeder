@@ -1,4 +1,4 @@
-# Make sure to put your OpenAI api_key in .env file 
+# Make sure to put all your Confluence Parameters and OpenAI api_key in .env file 
 # Command to run the script :
 # python Confluence_export_file_to_VS.py 
 
@@ -7,6 +7,7 @@ import os
 from openai import OpenAI, AssistantEventHandler
 from typing_extensions import override
 from dotenv import load_dotenv
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,8 +16,14 @@ load_dotenv()
 parser = argparse.ArgumentParser(description="Export files to VS using the Confluence API.")
 args = parser.parse_args()
 
-# Get the API key from environment variable
+# Get variables from environment
 api_key = os.getenv('OPENAI_API_KEY')
+output_dir = os.getenv('OUTPUT_DIR', 'Docs')
+space_key = os.getenv('SPACE_KEY')
+
+# Check for missing variables
+if not space_key:
+    raise ValueError("Space key not found. Please set the SPACE_KEY environment variable.")
 if not api_key:
     raise ValueError("API key not found. Please set the OPENAI_API_KEY environment variable.")
 
@@ -24,7 +31,7 @@ if not api_key:
 client = OpenAI(api_key=api_key)
 
 # Define the name for the vector store
-vector_store_name = "Document Vector Store"
+vector_store_name = f"Confluence Document Vector Store ({space_key})"
 
 # List all vector stores to check if one with the same name already exists
 existing_vector_stores = client.beta.vector_stores.list()
@@ -44,13 +51,26 @@ if vector_store_id:
 # Create a new vector store
 vector_store = client.beta.vector_stores.create(name=vector_store_name)
 
-# Get list of PDF files in Docs directory
-file_paths = [os.path.join("Docs", file) for file in os.listdir("Docs") if file.endswith(".pdf")]
+# Get list of PDF files in output_dir directory
+file_paths = [os.path.join(output_dir, file) for file in os.listdir(output_dir) if file.endswith(".pdf")]
 file_streams = []
 
 # Try to open each file and handle any errors
 for path in file_paths:
     try:
+        filename = os.path.basename(path)
+        # Extract filename without date and time part
+        base_filename = re.match(r'(.+?)_\d{8}_\d{6}\.pdf', filename).group(1)
+        
+        # Check if the file already exists in OpenAI storage
+        existing_files = client.files.list()
+        for f in existing_files.data:
+            if base_filename in f.filename:
+                print(f"File with base name '{base_filename}' already exists. Deleting it...")
+                client.files.delete(f.id)
+                print(f"Deleted file with ID {f.id}")
+        
+        # If no matching file is found or after deletion, open the new file for upload
         file_streams.append(open(path, "rb"))
     except Exception as e:
         print(f"Error opening file {path}: {e}")
@@ -69,9 +89,9 @@ else:
 
 # Create a new Assistant with File Search Enabled
 assistant = client.beta.assistants.create(
-    name="Document Search Assistant",
+    name="Confluence Document Search Assistant",
     instructions="You are a helpful assistant that answers queries based on the files provided. Make sure to try all the files before saying that you cannot find an answer. Do not use any prior knowledge or external information to answer the query. If the provided texts do not contain the answer, say that you cannot find an answer.",
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     tools=[{"type": "file_search"}],
 )
 
