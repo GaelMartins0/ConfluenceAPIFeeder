@@ -1,7 +1,3 @@
-# Make sure to put all your Confluence Parameters and OpenAI api_key in .env file 
-# Command to run the script :
-# python Confluence_export_all_pages.py
-
 import requests
 from requests.auth import HTTPBasicAuth
 import os
